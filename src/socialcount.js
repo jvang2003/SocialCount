@@ -18,41 +18,18 @@
 		return false;
 	}
 
-	function removeFileName( src ) {
-		var split = src.split( '/' );
-		split.pop();
-		return split.join( '/' ) + '/';
-	}
-
-	function resolveServiceDir() {
-		var baseUrl;
-
-		$( 'script' ).each(function() {
-			var src = this.src || '',
-				dir;
-			if( src.match( SocialCount.scriptSrcRegex ) ) {
-				baseUrl = removeFileName( src );
-				return false;
-			}
-		});
-
-		return baseUrl;
-	}
-
 	function writeCounts( data, elements ) {
-		if ( SocialCount.useSharedCountService ) {
-			data = {
-				facebook: data.Facebook.total_count,
-				twitter: data.Twitter,
-				googleplus: data.GooglePlusOne
-			};
-		}
+		var mappedData = {
+			facebook: data.Facebook.total_count,
+			twitter: data.Twitter,
+			googleplus: data.GooglePlusOne
+		};
 
-		for( var j in data ) {
-			if( data.hasOwnProperty( j ) ) {
-				if( elements[ j ] && data[ j ] > SocialCount.minCount ) {
+		for( var j in mappedData ) {
+			if( mappedData.hasOwnProperty( j ) ) {
+				if( elements[ j ] && mappedData[ j ] > SocialCount.minCount ) {
 					elements[ j ].addClass( SocialCount.classes.minCount )
-						.html( SocialCount.normalizeCount( data[ j ] ) );
+						.html( SocialCount.normalizeCount( mappedData[ j ] ) );
 				}
 			}
 		}
@@ -62,8 +39,7 @@
 		// For A-grade experience, require querySelector (IE8+) and not BlackBerry or touchscreen
 		isGradeA: 'querySelectorAll' in doc && !win.blackberry && !('ontouchstart' in window) && !('onmsgesturechange' in window),
 		minCount: 1,
-		useSharedCountService: true,
-		serviceUrl: 'service/index.php',
+		sharedCountUrl: (location.protocol === "https:" ? "https://sharedcount.appspot.com/" : "http://api.sharedcount.com/"),
 		initSelector: '.socialcount',
 		classes: {
 			gradeA: 'grade-a',
@@ -82,7 +58,6 @@
 			twitter: '.twitter',
 			googleplus: '.googleplus'
 		},
-		scriptSrcRegex: /socialcount[\w.]*.js/i,
 		plugins: {
 			init: [],
 			bind: []
@@ -90,9 +65,6 @@
 
 		// private, but for testing
 		cache: {},
-
-		removeFileName: removeFileName,
-		resolveServiceDir: resolveServiceDir,
 
 		isCssAnimations: function() {
 			return featureTest( 'AnimationName', 'animationName' );
@@ -133,23 +105,13 @@
 			}
 
 			if( !cache[ url ] ) {
-				if ( SocialCount.useSharedCountService ) {
-					cache[ url ] = $.ajax({
-						url: (location.protocol == "https:" ? "https://sharedcount.appspot.com/" : "http://api.sharedcount.com/"),
-						data: {
-							url: url
-						},
-						dataType: 'json'
-					});
-				} else {
-					cache[ url ] = $.ajax({
-						url: resolveServiceDir() + SocialCount.serviceUrl,
-						data: {
-							url: url
-						},
-						dataType: 'json'
-					});
-				}
+				cache[ url ] = $.ajax({
+					url: SocialCount.sharedCountUrl,
+					data: {
+						url: url
+					},
+					dataType: 'json'
+				});
 			}
 
 			cache[ url ].done( function complete( data ) {
