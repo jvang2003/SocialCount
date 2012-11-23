@@ -1,4 +1,4 @@
-/*! SocialCount - v0.1.3 - 2012-11-21
+/*! SocialCount - v0.1.3 - 2012-11-23
 * https://github.com/filamentgroup/SocialCount
 * Copyright (c) 2012 zachleat; Licensed MIT */
 
@@ -22,32 +22,28 @@
 		return false;
 	}
 
-	function removeFileName( src ) {
-		var split = src.split( '/' );
-		split.pop();
-		return split.join( '/' ) + '/';
-	}
+	function writeCounts( data, elements ) {
+		var mappedData = {
+			facebook: data.Facebook.total_count,
+			twitter: data.Twitter,
+			googleplus: data.GooglePlusOne
+		};
 
-	function resolveServiceDir() {
-		var baseUrl;
-
-		$( 'script' ).each(function() {
-			var src = this.src || '',
-				dir;
-			if( src.match( SocialCount.scriptSrcRegex ) ) {
-				baseUrl = removeFileName( src );
-				return false;
+		for( var j in mappedData ) {
+			if( mappedData.hasOwnProperty( j ) ) {
+				if( elements[ j ] && mappedData[ j ] > SocialCount.minCount ) {
+					elements[ j ].addClass( SocialCount.classes.minCount )
+						.html( SocialCount.normalizeCount( mappedData[ j ] ) );
+				}
 			}
-		});
-
-		return baseUrl;
+		}
 	}
 
 	var SocialCount = {
 		// For A-grade experience, require querySelector (IE8+) and not BlackBerry or touchscreen
 		isGradeA: 'querySelectorAll' in doc && !win.blackberry && !('ontouchstart' in window) && !('onmsgesturechange' in window),
 		minCount: 1,
-		serviceUrl: 'service/index.php',
+		sharedCountUrl: (location.protocol === "https:" ? "https://sharedcount.appspot.com/" : "http://api.sharedcount.com/"),
 		initSelector: '.socialcount',
 		classes: {
 			gradeA: 'grade-a',
@@ -66,7 +62,6 @@
 			twitter: '.twitter',
 			googleplus: '.googleplus'
 		},
-		scriptSrcRegex: /socialcount[\w.]*.js/i,
 		plugins: {
 			init: [],
 			bind: []
@@ -74,9 +69,6 @@
 
 		// private, but for testing
 		cache: {},
-
-		removeFileName: removeFileName,
-		resolveServiceDir: resolveServiceDir,
 
 		isCssAnimations: function() {
 			return featureTest( 'AnimationName', 'animationName' );
@@ -118,7 +110,7 @@
 
 			if( !cache[ url ] ) {
 				cache[ url ] = $.ajax({
-					url: resolveServiceDir() + SocialCount.serviceUrl,
+					url: SocialCount.sharedCountUrl,
 					data: {
 						url: url
 					},
@@ -127,14 +119,7 @@
 			}
 
 			cache[ url ].done( function complete( data ) {
-				for( var j in data ) {
-					if( data.hasOwnProperty( j ) ) {
-						if( counts[ j ] && data[ j ] > SocialCount.minCount ) {
-							counts[ j ].addClass( SocialCount.classes.minCount )
-								.html( SocialCount.normalizeCount( data[ j ] ) );
-						}
-					}
-				}
+				writeCounts( data, counts );
 			});
 
 			return cache[ url ];
