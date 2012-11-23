@@ -44,8 +44,7 @@ module.exports = function(grunt) {
 		copy: {
 			dist: {
 				files: {
-					"dist/": "src/*.png",
-					"dist/service/": "src/service/**"
+					"dist/": "src/*.png"
 				}
 			}
 		},
