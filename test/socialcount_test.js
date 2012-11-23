@@ -60,13 +60,6 @@
 	});
 
 	module( 'testServiceNormalization' );
-	test( 'filenameRemoval', function() {
-		// uses Math.floor
-		equal( SocialCount.removeFileName( 'http://localhost/SocialCount/src/socialcount.js' ), 'http://localhost/SocialCount/src/' );
-		equal( SocialCount.removeFileName( 'http://localhost/SocialCount/dist/socialcount.min.js' ), 'http://localhost/SocialCount/dist/' );
-		equal( SocialCount.removeFileName( 'http://fgte.st/SocialCount/src/socialcount.js' ), 'http://fgte.st/SocialCount/src/' );
-		equal( SocialCount.removeFileName( 'http://fgte.st/SocialCount/dist/socialcount.min.js' ), 'http://fgte.st/SocialCount/dist/' );
-	});
 
 	module('testInitialize', {
 		setup: function() {
@@ -115,6 +108,7 @@
 			$test = $( '#test' ),
 			gplusLabel = $test.find( '.googleplus .count' ).html();
 
+		SocialCount.useSharedCountService = false;
 		SocialCount.cache['http://www.google.com/'] = dfd.promise();
 
 		SocialCount.getCounts( $test, 'http://www.google.com/' ).done(function() {
@@ -127,9 +121,23 @@
 
 		window.setTimeout(function() {
 			dfd.resolve({
-				'twitter': 11464062,
-				'facebook': 5189703,
-				'googleplus': 1570539
+				"Buzz": 0,
+				"Delicious": 22493,
+				"Diggs": 0,
+				"Facebook": {
+					"click_count": 265614,
+					"comment_count": 1126601,
+					"commentsbox_count": 440,
+					"like_count": 990862,
+					"share_count": 3101440,
+					"total_count": 5218903
+				},
+				"GooglePlusOne": 1591986,
+				"LinkedIn": 15214,
+				"Pinterest": 304939,
+				"Reddit": 0,
+				"StumbleUpon": 0,
+				"Twitter": 11471098
 			});
 		}, 50 );
 	});
@@ -139,6 +147,7 @@
 			$test = $( '#test' ),
 			gplusLabel = $test.find( '.googleplus .count' ).html();
 
+		SocialCount.useSharedCountService = false;
 		SocialCount.cache['http://www.google.com/'] = dfd.promise();
 
 		SocialCount.getCounts( $test, 'http://www.google.com/' ).done(function() {
@@ -151,11 +160,43 @@
 
 		window.setTimeout(function() {
 			dfd.resolve({
-				'twitter': 11464062,
-				'facebook': 5189703,
-				'googleplus': SocialCount.minCount - 1
+				"Buzz": 0,
+				"Delicious": 22493,
+				"Diggs": 0,
+				"Facebook": {
+					"click_count": 265614,
+					"comment_count": 1126601,
+					"commentsbox_count": 440,
+					"like_count": 990862,
+					"share_count": 3101440,
+					"total_count": 5218903
+				},
+				"GooglePlusOne": SocialCount.minCount - 1,
+				"LinkedIn": 15214,
+				"Pinterest": 304939,
+				"Reddit": 0,
+				"StumbleUpon": 0,
+				"Twitter": 11471098
 			});
 		}, 50 );
+	});
+
+	asyncTest( 'Test can use SharedCount API to get counts', 3, function() {
+		var $test = $( '#test' ),
+			twitterLabel = $test.find( '.twitter .count' ).html(),
+			facebookLabel = $test.find( '.facebook .count' ).html(),
+			gplusLabel = $test.find( '.googleplus .count' ).html();
+
+		SocialCount.useSharedCountService = true;
+		SocialCount.cache['http://www.google.com/'] = null;
+
+		SocialCount.getCounts( $test, 'http://www.google.com/' ).done(function() {
+			notEqual( $test.find( '.twitter .count' ).html(), twitterLabel );
+			notEqual( $test.find( '.facebook .count' ).html(), facebookLabel );
+			notEqual( $test.find( '.googleplus .count' ).html(), gplusLabel );
+
+			start();
+		});
 	});
 
 	module('testInitializeNoUrl', {
@@ -206,5 +247,4 @@
 		equal( SocialCount.isSmallSize( $('#test') ), true );
 	});
 
-		// $fixture.append( '<ul id="test" class="socialcount"><li class="facebook"><a href="https://www.facebook.com/sharer/sharer.php?u=http://www.google.com/" title="Share on Facebook"><span class="icon icon-facebook"></span><span class="count">Like</span></a></li><li class="twitter"><a href="https://twitter.com/intent/tweet?text=http://www.google.com/" title="Share on Twitter"><span class="icon icon-twitter"></span><span class="count">Tweet</span></a></li><li class="googleplus"><a href="https://plusone.google.com/_/+1/confirm?url=http://www.google.com/" title="Share on Google Plus"><span class="icon icon-googleplus"></span><span class="count">+1</span></a></li></ul>' );
 }( jQuery ));

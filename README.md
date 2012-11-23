@@ -1,4 +1,4 @@
-# SocialCount
+# SocialCount (with SharedCount support) 
 
 The problems with social networking widgets are [well documented][zurb]. They're heavy and slow to load especially on high-latency mobile connections.
 
@@ -7,7 +7,7 @@ The problems with social networking widgets are [well documented][zurb]. They're
 SocialCount is a small jQuery plugin for progressively enhanced, lazy loaded, mobile friendly social networking widgets.
 
  * Currently supports Facebook, Twitter, and Google Plus.
- * **2.93KB** (after Min+GZip) or 4.18KB/4.72KB with SD/HD icons (compared to 309KB up front empty-cache pageload cost for Facebook, Twitter, and Google Plus widgets)
+ * **2.88KB** (after Min+GZip) or 4.13KB/4.67KB with SD/HD icons (compared to 309KB up front empty-cache pageload cost for Facebook, Twitter, and Google Plus widgets)
  * 1 JS request, 1 CSS request, 1 optional request for icons, 1 optional AJAX request for counts (compared to 25 total requests for Facebook, Twitter, and Google Plus widgets)
  * Easy to fit in with existing page design
  * Ability to share without JavaScript or before JavaScript has loaded.
@@ -18,21 +18,19 @@ SocialCount is a small jQuery plugin for progressively enhanced, lazy loaded, mo
  * Option to conditionally display count if it's above a minimum threshold. Avoid goose egg ghost-town.
  * Intelligent client-side caching so that two or more widgets with the same share URL only make one AJAX request.
 
-## [SocialCount Demo][demourl]
-
-[demourl]: http://fgte.st/SocialCount/examples/index.html
-
 ## Getting Started
 
 The following archive contains both minified (`socialcount.min.js`+`socialcount.min.css`) and unminified (`socialcount.js`+`socialcount.css`) versions of the JS and CSS required to use SocialCount.
 
 SocialCount also has a version that packages the social networking icons as well. Use the regular `socialcount.js` with `socialcount-with-icons.css` or `socialcount-with-icons.min.css` and the included SD and HD image sprites.
 
-The archive also contains the **optional** PHP service files for the AJAX request to retrieve the share counts (requires PHP 5 with curl). To enable this feature for your widget, use `<ul class="socialcount" data-counts="true">`.
+This plugin comes with [SharedCount][sc] support built in to gather counts across social networks. To enable this feature for your widget, use `<ul class="socialcount" data-counts="true">`.
+
+[sc]: http://sharedcount.com/
 
 ### Download [socialcount.zip][zipfile]
 
-[zipfile]: https://raw.github.com/filamentgroup/SocialCount/master/dist/socialcount.zip
+[zipfile]: https://raw.github.com/xyu/SocialCount/master/dist/socialcount.zip
 
 ### Markup with icons:
 
@@ -74,15 +72,14 @@ Touchscreens (Links Only)
 ## Contributing
 Add unit tests for any new or changed functionality. Lint and test your JavaScript code using [grunt](https://github.com/cowboy/grunt) and the `grunt qunit` command.
 
-To test the PHP code, navigate to the `service` directory and run `phpunit socialcount_service_test.php`
-
-
 ## Release History
 * `v0.1.0` Initial release
 * `v0.1.1` Fix for IE (tested up to 9) issue with iframes and :hover rules
 * `v0.1.2` Default AJAX request for counts to false, added zip download, better documentation for counts service.
 * `v0.1.3` Added code to normalize service url directory (easier configuration).
+* `v0.1.3.1` Added SharedCount support
 
 ## License
 Copyright (c) 2012 Filament Group
+Copyright (c) 2012 @HypertextRanch
 Licensed under the MIT license.
